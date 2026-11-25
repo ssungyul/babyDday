@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>아기 만나는 날</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 12px;
+    background: #F5F0E9;
+    font-family: 'Gowun Dodum', sans-serif;
+    color: #665346;
+  }
+
+  .widget {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 32px 22px 30px;
+    background: #FFFCF7;
+    border: 1px solid #EDE4D9;
+    border-radius: 22px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    margin: 0 0 27px;
+    color: #A89787;
+    font-size: 11px;
+    letter-spacing: 3px;
+    font-weight: 400;
+  }
+
+  h1 {
+    margin: 0;
+    color: #6C5748;
+    font-family: 'Gowun Batang', serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -1px;
+  }
+
+  .dday-area {
+    margin: 25px 0 0;
+    padding: 27px 10px 29px;
+    background: #F8F3EC;
+    border-radius: 17px;
+  }
+
+  .dday {
+    color: #A17E63;
+    font-family: 'Gowun Batang', serif;
+    font-size: clamp(48px, 14vw, 64px);
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dday-label {
+    margin-top: 12px;
+    color: #A89787;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 12px;
+  }
+
+  .error {
+    color: #A65E50;
+    font-size: 13px;
+    padding: 20px 0;
+  }
+</style>
+</head>
+
+<body>
+<div class="widget">
+  <p class="eyebrow">OUR LITTLE ONE</p>
+  <h1>아기 만나는 날</h1>
+
+  <div id="content">
+    <div class="dday-area">
+      <div class="dday" id="dday">D-000</div>
+      <div class="dday-label" id="label">
+        우리 아기를 만날 날까지
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const due = params.get("due");
+
+  const ddayElement = document.getElementById("dday");
+  const labelElement = document.getElementById("label");
+
+  function showError() {
+    document.getElementById("content").innerHTML =
+      '<div class="error">출산 예정일을 확인해 주세요.</div>';
+  }
+
+  if (!due || !/^\d{4}-\d{2}-\d{2}$/.test(due)) {
+    showError();
+  } else {
+    const [year, month, day] = due.split("-").map(Number);
+    const target = new Date(year, month - 1, day);
+
+    const validDate =
+      target.getFullYear() === year &&
+      target.getMonth() === month - 1 &&
+      target.getDate() === day;
+
+    if (!validDate) {
+      showError();
+    } else {
+      function updateDday() {
+        const now = new Date();
+        const today = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate()
+        );
+
+        const diff = Math.round(
+          (target.getTime() - today.getTime()) / 86400000
+        );
+
+        if (diff > 0) {
+          ddayElement.textContent = `D-${diff}`;
+          labelElement.textContent = "우리 아기를 만날 날까지";
+        } else if (diff === 0) {
+          ddayElement.textContent = "D-DAY";
+          labelElement.textContent = "오늘, 아기를 만나는 날";
+        } else {
+          ddayElement.textContent = `D+${Math.abs(diff)}`;
+          labelElement.textContent = "아기와 함께한 소중한 시간";
+        }
+      }
+
+      updateDday();
+    }
+  }
+</script>
+</body>
+</html>
